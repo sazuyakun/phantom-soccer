@@ -4,8 +4,8 @@ import { RepeatWrapping, SRGBColorSpace, TextureLoader } from "three"
 
 import floorTextureUrl from "../../assets/floor.png"
 
-// The visual floor is much bigger than the playable area so it
-// fades into the fog at the horizon instead of showing an edge.
+// The visual floor is much bigger than the playable area so its far
+// edge sits at the horizon instead of in view.
 const FLOOR_SIZE = 100
 
 /**
@@ -24,7 +24,7 @@ export function MovementArea() {
   return (
     <mesh rotation-x={-Math.PI / 2}>
       <planeGeometry args={[FLOOR_SIZE, FLOOR_SIZE]} />
-      <meshLambertMaterial map={texture} />
+      <meshBasicMaterial map={texture} />
     </mesh>
   )
 }
