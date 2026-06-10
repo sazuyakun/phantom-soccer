@@ -15,7 +15,7 @@ export function GameScene() {
   return (
     <Canvas
       dpr={1}
-      camera={{ position: CAMERA_POSITION, fov: 45 }}
+      camera={{ position: CAMERA_POSITION, fov: 90 }}
       onCreated={({ camera }) => camera.lookAt(...CAMERA_LOOK_AT)}
     >
       <color attach="background" args={[SKY_BLUE]} />
