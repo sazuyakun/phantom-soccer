@@ -1,12 +1,14 @@
 import nipplejs from "nipplejs"
 import { useEffect, useRef } from "react"
 
+import { LOGIC_FPS } from "../../shared/constants"
+
 // joystick movement below this magnitude counts as not moving at all —
 // without it the smallest touch causes motion
 const DEAD_ZONE = 0.25
-// how often we report controls to the logic; sending only on change at
-// a modest rate keeps the action stream small
-const SEND_INTERVAL = 100
+// report controls at most once per logic tick, and only on change —
+// sending faster than the logic consumes them would be wasted actions
+const SEND_INTERVAL = 1000 / LOGIC_FPS
 
 /**
  * The on-screen movement joystick (bottom-left). Reads nipplejs and
