@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react"
+import { PlayerId } from "rune-sdk"
 
 import { GameScene } from "./components/GameScene"
 import { GameState } from "./logic.ts"
 
 function App() {
   const [game, setGame] = useState<GameState>()
+  const [yourPlayerId, setYourPlayerId] = useState<PlayerId | undefined>()
 
   useEffect(() => {
     Rune.initClient({
-      onChange: ({ game }) => {
+      onChange: ({ game, yourPlayerId }) => {
         setGame(game)
+        setYourPlayerId(yourPlayerId)
       },
     })
   }, [])
@@ -19,7 +22,7 @@ function App() {
     return
   }
 
-  return <GameScene game={game} />
+  return <GameScene game={game} yourPlayerId={yourPlayerId} />
 }
 
 export default App

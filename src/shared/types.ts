@@ -14,4 +14,7 @@ export type Character = {
   position: Vec3
   // rotation around the Y axis the character is facing
   angle: number
+  // which side of the field the player calls home (1 = near the
+  // default camera, -1 = far); each client views from its own side
+  side: 1 | -1
 }

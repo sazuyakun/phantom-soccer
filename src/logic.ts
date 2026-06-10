@@ -13,22 +13,25 @@ declare global {
   const Rune: RuneClient<GameState, GameActions>
 }
 
-// spawn positions fan out left/right from the center of the field,
-// facing the camera
+// how far from the center line each player spawns
+const SPAWN_DISTANCE = 3
+
+// the two players spawn facing each other across the field; each
+// client shows its own player on the near side (see GameScene)
 function addCharacter(id: PlayerId, state: GameState) {
-  const index = state.characters.length
-  const offset = Math.ceil(index / 2) * 2 * (index % 2 === 0 ? 1 : -1)
+  const side = state.characters.some((c) => c.side === 1) ? -1 : 1
 
   state.characters.push({
     id,
-    position: { x: offset, y: 0, z: 0 },
-    angle: 0,
+    position: { x: 0, y: 0, z: side * SPAWN_DISTANCE },
+    angle: side === 1 ? Math.PI : 0,
+    side,
   })
 }
 
 Rune.initLogic({
-  minPlayers: 1,
-  maxPlayers: 6,
+  minPlayers: 2,
+  maxPlayers: 2,
   landscape: true,
   setup: (allPlayerIds) => {
     const state: GameState = { characters: [] }
