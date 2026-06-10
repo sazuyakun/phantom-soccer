@@ -15,20 +15,13 @@ const TURN_SPEED = 10
 // of gliding across the field
 const SNAP_DISTANCE = 2
 
-// move-toward interpolation: the logic only ticks 10 times a second, so
-// every frame we walk the rendered position toward the logic position at
-// the speed the logic reported, which reads as continuous motion
-function interpolate(current: number, target: number, step: number) {
-  if (current < target) return Math.min(target, current + step)
-  return Math.max(target, current - step)
-}
-
-// angles need the same, but wrapping around ±π
+// move-toward interpolation for angles, wrapping around ±π
 function interpolateAngle(current: number, target: number, step: number) {
   if (Math.abs(target - current) > Math.PI) {
     current += Math.sign(target - current) * 2 * Math.PI
   }
-  return interpolate(current, target, step)
+  if (current < target) return Math.min(target, current + step)
+  return Math.max(target, current - step)
 }
 
 /**
@@ -70,10 +63,9 @@ export function PlayerBlob(props: {
     if (!g) return
 
     const target = character.position
-    const distance = Math.hypot(
-      target.x - g.position.x,
-      target.z - g.position.z
-    )
+    const dx = target.x - g.position.x
+    const dz = target.z - g.position.z
+    const distance = Math.hypot(dx, dz)
 
     if (distance > SNAP_DISTANCE) {
       g.position.set(target.x, target.y, target.z)
@@ -81,10 +73,19 @@ export function PlayerBlob(props: {
       return
     }
 
-    // glide to rest at MOVE_SPEED once the logic reports we stopped
+    // the logic only ticks 10 times a second, so every frame we walk the
+    // rendered position toward the logic position ALONG the actual
+    // direction of travel at the speed the logic reported — per-axis
+    // stepping would finish each axis early on diagonals and stutter.
+    // (speed falls back to MOVE_SPEED to glide to rest after stopping)
     const step = (character.speed || MOVE_SPEED) * delta
-    g.position.x = interpolate(g.position.x, target.x, step)
-    g.position.z = interpolate(g.position.z, target.z, step)
+    if (step >= distance) {
+      g.position.x = target.x
+      g.position.z = target.z
+    } else {
+      g.position.x += (dx / distance) * step
+      g.position.z += (dz / distance) * step
+    }
     g.rotation.y = interpolateAngle(
       g.rotation.y,
       character.angle,
