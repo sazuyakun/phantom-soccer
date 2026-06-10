@@ -84,8 +84,9 @@ Rune.initLogic({
         character.position.z + dz,
         MOVEMENT_AREA.depth / 2
       )
-      // face the direction of travel (angle 0 faces +z)
-      character.angle = Math.atan2(-dx, dz)
+      // face the direction of travel: the blob's face is on local +z,
+      // and rotating +z by angle a around Y points it at (sin a, cos a)
+      character.angle = Math.atan2(dx, dz)
       // record how fast we moved so the client can interpolate smoothly
       character.speed =
         Math.sqrt(controls.x * controls.x + controls.y * controls.y) *
