@@ -1,5 +1,4 @@
 import { useLoader } from "@react-three/fiber"
-import { useMemo } from "react"
 import { RepeatWrapping, SRGBColorSpace, TextureLoader } from "three"
 
 import floorTextureUrl from "../../assets/floor.png"
@@ -13,13 +12,11 @@ const FLOOR_SIZE = 100
  * around on. Static geometry, never re-renders.
  */
 export function MovementArea() {
+  // useLoader caches the texture, so this configuration is idempotent
   const texture = useLoader(TextureLoader, floorTextureUrl)
-
-  useMemo(() => {
-    texture.wrapS = texture.wrapT = RepeatWrapping
-    texture.repeat.set(FLOOR_SIZE / 2, FLOOR_SIZE / 2)
-    texture.colorSpace = SRGBColorSpace
-  }, [texture])
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(FLOOR_SIZE / 2, FLOOR_SIZE / 2)
+  texture.colorSpace = SRGBColorSpace
 
   return (
     <mesh rotation-x={-Math.PI / 2}>

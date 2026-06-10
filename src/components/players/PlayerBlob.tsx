@@ -1,14 +1,7 @@
 import { Character } from "../../shared/types"
 
 // one color per player, picked by join order
-const BLOB_COLORS = [
-  "#e2574c",
-  "#4c8be2",
-  "#e2b34c",
-  "#9b59b6",
-  "#1abc9c",
-  "#e67ee2",
-]
+const BLOB_COLORS = ["#e2574c", "#4c8be2"]
 
 /**
  * Placeholder player: a blob with a face and hands, built from
@@ -32,14 +25,12 @@ export function PlayerBlob(props: {
       </mesh>
 
       {/* eyes */}
-      <mesh position={[-0.18, 0.72, 0.46]}>
-        <sphereGeometry args={[0.07, 12, 12]} />
-        <meshBasicMaterial color="#222222" />
-      </mesh>
-      <mesh position={[0.18, 0.72, 0.46]}>
-        <sphereGeometry args={[0.07, 12, 12]} />
-        <meshBasicMaterial color="#222222" />
-      </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.18, 0.72, 0.46]}>
+          <sphereGeometry args={[0.07, 12, 12]} />
+          <meshBasicMaterial color="#222222" />
+        </mesh>
+      ))}
 
       {/* mouth */}
       <mesh position={[0, 0.48, 0.51]}>
@@ -48,14 +39,12 @@ export function PlayerBlob(props: {
       </mesh>
 
       {/* hands */}
-      <mesh position={[-0.6, 0.45, 0]}>
-        <sphereGeometry args={[0.14, 12, 12]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-      <mesh position={[0.6, 0.45, 0]}>
-        <sphereGeometry args={[0.14, 12, 12]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.6, 0.45, 0]}>
+          <sphereGeometry args={[0.14, 12, 12]} />
+          <meshBasicMaterial color={color} />
+        </mesh>
+      ))}
     </group>
   )
 }
