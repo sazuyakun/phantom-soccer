@@ -1,9 +1,10 @@
 import { useFrame } from "@react-three/fiber"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Group } from "three"
 
 import { MOVE_SPEED } from "../../shared/constants"
 import { Character } from "../../shared/types"
+import { characterRefs } from "./characterRefs"
 
 // one color per player, picked by join order
 const BLOB_COLORS = ["#e2574c", "#4c8be2"]
@@ -54,6 +55,15 @@ export function PlayerBlob(props: {
     ] as const,
     angle: character.angle,
   }))
+
+  // expose the rendered node so the camera rig can follow it
+  useEffect(() => {
+    const g = group.current
+    if (g) characterRefs.set(character.id, g)
+    return () => {
+      characterRefs.delete(character.id)
+    }
+  }, [character.id])
 
   useFrame((_, delta) => {
     const g = group.current

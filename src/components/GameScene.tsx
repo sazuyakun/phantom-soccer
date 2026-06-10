@@ -3,13 +3,14 @@ import { PlayerId } from "rune-sdk"
 import { Suspense } from "react"
 
 import { GameState } from "../logic"
+import { CameraRig } from "./CameraRig"
 import { MovementArea } from "./environment/MovementArea"
 import { PlayerBlob } from "./players/PlayerBlob"
 
 const SKY_BLUE = "#87ceeb"
 
-// The camera is fixed: it never moves, everything moves in front of it.
-// Low and almost level with the ground so the floor runs out to the horizon.
+// Initial pose only — from the first frame on, CameraRig keeps the
+// camera at a fixed offset from your character.
 const CAMERA_POSITION: [number, number, number] = [0, 2, 5.5]
 const CAMERA_LOOK_AT: [number, number, number] = [0, 0.6, 0]
 
@@ -32,6 +33,7 @@ export function GameScene(props: {
       onCreated={({ camera }) => camera.lookAt(...CAMERA_LOOK_AT)}
     >
       <color attach="background" args={[SKY_BLUE]} />
+      <CameraRig targetId={yourPlayerId} />
 
       <group rotation-y={worldRotation}>
         <Suspense fallback={null}>
