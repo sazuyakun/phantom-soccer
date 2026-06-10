@@ -39,6 +39,9 @@ export default [
       "prettier/prettier": "warn",
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "warn",
+      // react-three-fiber renders three.js scene-graph elements whose props
+      // (args, attach, position, intensity, ...) this DOM-oriented rule rejects
+      "react/no-unknown-property": "off",
     },
   },
 ]
