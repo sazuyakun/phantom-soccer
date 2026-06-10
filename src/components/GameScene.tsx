@@ -10,8 +10,8 @@ const SKY_BLUE = "#87ceeb"
 
 // The camera is fixed: it never moves, everything moves in front of it.
 // Low and almost level with the ground so the floor runs out to the horizon.
-const CAMERA_POSITION: [number, number, number] = [0, 2.5, 8]
-const CAMERA_LOOK_AT: [number, number, number] = [0, 1, 0]
+const CAMERA_POSITION: [number, number, number] = [0, 2, 5.5]
+const CAMERA_LOOK_AT: [number, number, number] = [0, 0.6, 0]
 
 export function GameScene(props: {
   game: GameState
