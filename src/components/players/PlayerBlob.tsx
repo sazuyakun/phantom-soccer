@@ -6,16 +6,14 @@ import { MOVE_SPEED } from "../../shared/constants"
 import { Character } from "../../shared/types"
 import { characterRefs } from "./characterRefs"
 
-// one color per player, picked by join order
 const BLOB_COLORS = ["#e2574c", "#4c8be2"]
 
-// how fast a blob turns to face its direction of travel, radians/second
+// how fast a blob turns to face its travel direction, radians/sec
 const TURN_SPEED = 10
-// corrections larger than this (e.g. a server rollback) snap instead
-// of gliding across the field
+// corrections larger than this (e.g. a rollback) snap instead of gliding
 const SNAP_DISTANCE = 2
 
-// move-toward interpolation for angles, wrapping around ±π
+// move-toward for angles, wrapping around ±π
 function interpolateAngle(current: number, target: number, step: number) {
   if (Math.abs(target - current) > Math.PI) {
     current += Math.sign(target - current) * 2 * Math.PI
@@ -25,9 +23,8 @@ function interpolateAngle(current: number, target: number, step: number) {
 }
 
 /**
- * Placeholder player: a blob with a face and hands, built from
- * primitives. The whole component gets swapped for a glTF model later —
- * its interface (a Character to render) stays the same.
+ * Placeholder player built from primitives — swaps for a glTF model
+ * later without changing its interface.
  */
 export function PlayerBlob(props: {
   character: Character
@@ -36,9 +33,8 @@ export function PlayerBlob(props: {
   const { character, colorIndex } = props
   const color = BLOB_COLORS[colorIndex % BLOB_COLORS.length]
 
-  // position and rotation are driven from useFrame, never from props,
-  // so React re-renders can't fight the interpolation; the spawn pose
-  // is frozen here purely for initial placement
+  // the transform is driven from useFrame; the spawn pose is frozen so
+  // React prop re-application can't fight the interpolation
   const group = useRef<Group>(null)
   const [spawn] = useState(() => ({
     position: [
@@ -49,7 +45,6 @@ export function PlayerBlob(props: {
     angle: character.angle,
   }))
 
-  // expose the rendered node so the camera rig can follow it
   useEffect(() => {
     const g = group.current
     if (g) characterRefs.set(character.id, g)
@@ -73,11 +68,9 @@ export function PlayerBlob(props: {
       return
     }
 
-    // the logic only ticks 10 times a second, so every frame we walk the
-    // rendered position toward the logic position ALONG the actual
-    // direction of travel at the speed the logic reported — per-axis
-    // stepping would finish each axis early on diagonals and stutter.
-    // (speed falls back to MOVE_SPEED to glide to rest after stopping)
+    // walk toward the logic position along the travel direction at the
+    // reported speed (per-axis stepping stutters on diagonals);
+    // MOVE_SPEED fallback glides the last stretch after stopping
     const step = (character.speed || MOVE_SPEED) * delta
     if (step >= distance) {
       g.position.x = target.x

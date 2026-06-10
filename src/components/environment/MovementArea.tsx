@@ -3,14 +3,9 @@ import { RepeatWrapping, SRGBColorSpace, TextureLoader } from "three"
 
 import floorTextureUrl from "../../assets/floor.png"
 
-// The visual floor is much bigger than the playable area so its far
-// edge sits at the horizon instead of in view.
+// much larger than the play area so its edge sits past the horizon
 const FLOOR_SIZE = 100
 
-/**
- * Non-interactable environment: the plain, flat ground players move
- * around on. Static geometry, never re-renders.
- */
 export function MovementArea() {
   // useLoader caches the texture, so this configuration is idempotent
   const texture = useLoader(TextureLoader, floorTextureUrl)

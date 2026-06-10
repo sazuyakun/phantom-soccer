@@ -1,16 +1,13 @@
-// Pure data shared between client and logic — no three.js imports allowed
-// here so that logic.ts stays deterministic and small.
+// Pure data shared between client and logic — no three.js here.
 
-// Size of the area players can move around in, in world units.
-// x runs along the long (landscape) axis, z toward the camera.
+// Playable area in world units: x along the landscape axis, z toward camera.
 export const MOVEMENT_AREA = {
   width: 24,
   depth: 16,
 } as const
 
-// How often the logic ticks. 10 FPS keeps the data model consistent;
-// the client interpolates in between to render smoothly.
+// Logic tick rate; the client interpolates in between.
 export const LOGIC_FPS = 10
 
-// How fast players move, in world units per second.
+// Player move speed, world units per second.
 export const MOVE_SPEED = 4

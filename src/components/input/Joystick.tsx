@@ -3,17 +3,11 @@ import { useEffect, useRef } from "react"
 
 import { LOGIC_FPS } from "../../shared/constants"
 
-// joystick movement below this magnitude counts as not moving at all —
-// without it the smallest touch causes motion
+// stick movement below this magnitude doesn't count as moving
 const DEAD_ZONE = 0.25
-// report controls at most once per logic tick, and only on change —
-// sending faster than the logic consumes them would be wasted actions
+// report controls at most once per logic tick, and only on change
 const SEND_INTERVAL = 1000 / LOGIC_FPS
 
-/**
- * The on-screen movement joystick (bottom-left). Reads nipplejs and
- * reports view-space controls to the logic whenever they change.
- */
 export function Joystick() {
   const zone = useRef<HTMLDivElement>(null)
 

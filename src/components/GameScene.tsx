@@ -9,8 +9,7 @@ import { PlayerBlob } from "./players/PlayerBlob"
 
 const SKY_BLUE = "#87ceeb"
 
-// Initial pose only — from the first frame on, CameraRig keeps the
-// camera at a fixed offset from your character.
+// Initial pose only — CameraRig takes over from the first frame.
 const CAMERA_POSITION: [number, number, number] = [0, 2, 5.5]
 const CAMERA_LOOK_AT: [number, number, number] = [0, 0.6, 0]
 
@@ -20,9 +19,8 @@ export function GameScene(props: {
 }) {
   const { game, yourPlayerId } = props
 
-  // Each phone views the field from its own player's side. The camera
-  // never moves — instead the world is rotated 180° for the player who
-  // spawned on the far side, putting their character nearest the camera.
+  // the world rotates 180° for the far-side player, so each phone
+  // shows its own character nearest the camera
   const you = game.characters.find((c) => c.id === yourPlayerId)
   const worldRotation = you?.side === -1 ? Math.PI : 0
 

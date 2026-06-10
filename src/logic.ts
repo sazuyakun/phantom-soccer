@@ -5,7 +5,6 @@ import { Character, Controls } from "./shared/types"
 
 export interface GameState {
   characters: Character[]
-  // the latest controls reported by each player, applied every tick
   controls: Record<PlayerId, Controls>
 }
 
@@ -17,17 +16,14 @@ declare global {
   const Rune: RuneClient<GameState, GameActions>
 }
 
-// how far from the center line each player spawns
 const SPAWN_DISTANCE = 3
-
 const MOVE_PER_TICK = MOVE_SPEED / LOGIC_FPS
 
 function clamp(value: number, limit: number) {
   return Math.max(-limit, Math.min(limit, value))
 }
 
-// the two players spawn facing each other across the field; each
-// client shows its own player on the near side (see GameScene)
+// players spawn facing each other; each client shows its own side near the camera
 function addCharacter(id: PlayerId, state: GameState) {
   const side = state.characters.some((c) => c.side === 1) ? -1 : 1
 
@@ -63,8 +59,6 @@ Rune.initLogic({
     },
   },
   update: ({ game }) => {
-    // apply each player's controls, converting from their view space
-    // (joystick) to world space via the side they view the field from
     for (const character of game.characters) {
       const controls = game.controls[character.id]
 
@@ -73,6 +67,7 @@ Rune.initLogic({
         continue
       }
 
+      // controls are in the player's view space; their side maps it to world space
       const dx = character.side * controls.x * MOVE_PER_TICK
       const dz = -character.side * controls.y * MOVE_PER_TICK
 
@@ -84,10 +79,7 @@ Rune.initLogic({
         character.position.z + dz,
         MOVEMENT_AREA.depth / 2
       )
-      // face the direction of travel: the blob's face is on local +z,
-      // and rotating +z by angle a around Y points it at (sin a, cos a)
       character.angle = Math.atan2(dx, dz)
-      // record how fast we moved so the client can interpolate smoothly
       character.speed =
         Math.sqrt(controls.x * controls.x + controls.y * controls.y) *
         MOVE_SPEED
