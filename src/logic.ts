@@ -37,6 +37,7 @@ function findWinningCombo(cells: Cells) {
 Rune.initLogic({
   minPlayers: 2,
   maxPlayers: 2,
+  landscape: true,
   setup: (allPlayerIds) => ({
     cells: new Array(9).fill(null),
     winCombo: null,
