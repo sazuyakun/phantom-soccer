@@ -19,7 +19,7 @@ function App() {
     return
   }
 
-  return <GameScene />
+  return <GameScene game={game} />
 }
 
 export default App

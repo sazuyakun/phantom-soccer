@@ -1,7 +1,9 @@
 import { Canvas } from "@react-three/fiber"
 import { Suspense } from "react"
 
+import { GameState } from "../logic"
 import { MovementArea } from "./environment/MovementArea"
+import { PlayerBlob } from "./players/PlayerBlob"
 
 const SKY_BLUE = "#87ceeb"
 
@@ -10,7 +12,7 @@ const SKY_BLUE = "#87ceeb"
 const CAMERA_POSITION: [number, number, number] = [0, 2.5, 8]
 const CAMERA_LOOK_AT: [number, number, number] = [0, 1, 0]
 
-export function GameScene() {
+export function GameScene({ game }: { game: GameState }) {
   return (
     <Canvas
       dpr={1}
@@ -22,6 +24,14 @@ export function GameScene() {
       <Suspense fallback={null}>
         <MovementArea />
       </Suspense>
+
+      {game.characters.map((character, index) => (
+        <PlayerBlob
+          key={character.id}
+          character={character}
+          colorIndex={index}
+        />
+      ))}
     </Canvas>
   )
 }
