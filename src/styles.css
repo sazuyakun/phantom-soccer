@@ -12,3 +12,12 @@ body,
 canvas {
   touch-action: none;
 }
+
+#joystick {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  width: 130px;
+  height: 130px;
+  touch-action: none;
+}

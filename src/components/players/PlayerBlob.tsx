@@ -1,7 +1,34 @@
+import { useFrame } from "@react-three/fiber"
+import { useRef, useState } from "react"
+import { Group } from "three"
+
+import { MOVE_SPEED } from "../../shared/constants"
 import { Character } from "../../shared/types"
 
 // one color per player, picked by join order
 const BLOB_COLORS = ["#e2574c", "#4c8be2"]
+
+// how fast a blob turns to face its direction of travel, radians/second
+const TURN_SPEED = 10
+// corrections larger than this (e.g. a server rollback) snap instead
+// of gliding across the field
+const SNAP_DISTANCE = 2
+
+// move-toward interpolation: the logic only ticks 10 times a second, so
+// every frame we walk the rendered position toward the logic position at
+// the speed the logic reported, which reads as continuous motion
+function interpolate(current: number, target: number, step: number) {
+  if (current < target) return Math.min(target, current + step)
+  return Math.max(target, current - step)
+}
+
+// angles need the same, but wrapping around ±π
+function interpolateAngle(current: number, target: number, step: number) {
+  if (Math.abs(target - current) > Math.PI) {
+    current += Math.sign(target - current) * 2 * Math.PI
+  }
+  return interpolate(current, target, step)
+}
 
 /**
  * Placeholder player: a blob with a face and hands, built from
@@ -14,10 +41,49 @@ export function PlayerBlob(props: {
 }) {
   const { character, colorIndex } = props
   const color = BLOB_COLORS[colorIndex % BLOB_COLORS.length]
-  const { x, y, z } = character.position
+
+  // position and rotation are driven from useFrame, never from props,
+  // so React re-renders can't fight the interpolation; the spawn pose
+  // is frozen here purely for initial placement
+  const group = useRef<Group>(null)
+  const [spawn] = useState(() => ({
+    position: [
+      character.position.x,
+      character.position.y,
+      character.position.z,
+    ] as const,
+    angle: character.angle,
+  }))
+
+  useFrame((_, delta) => {
+    const g = group.current
+    if (!g) return
+
+    const target = character.position
+    const distance = Math.hypot(
+      target.x - g.position.x,
+      target.z - g.position.z
+    )
+
+    if (distance > SNAP_DISTANCE) {
+      g.position.set(target.x, target.y, target.z)
+      g.rotation.y = character.angle
+      return
+    }
+
+    // glide to rest at MOVE_SPEED once the logic reports we stopped
+    const step = (character.speed || MOVE_SPEED) * delta
+    g.position.x = interpolate(g.position.x, target.x, step)
+    g.position.z = interpolate(g.position.z, target.z, step)
+    g.rotation.y = interpolateAngle(
+      g.rotation.y,
+      character.angle,
+      TURN_SPEED * delta
+    )
+  })
 
   return (
-    <group position={[x, y, z]} rotation-y={character.angle}>
+    <group ref={group} position={spawn.position} rotation-y={spawn.angle}>
       {/* body */}
       <mesh position-y={0.55}>
         <sphereGeometry args={[0.55, 24, 24]} />

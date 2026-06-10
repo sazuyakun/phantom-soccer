@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { PlayerId } from "rune-sdk"
 
 import { GameScene } from "./components/GameScene"
+import { Joystick } from "./components/input/Joystick"
 import { GameState } from "./logic.ts"
 
 function App() {
@@ -22,7 +23,13 @@ function App() {
     return
   }
 
-  return <GameScene game={game} yourPlayerId={yourPlayerId} />
+  return (
+    <>
+      <GameScene game={game} yourPlayerId={yourPlayerId} />
+      {/* spectators don't get controls */}
+      {yourPlayerId && <Joystick />}
+    </>
+  )
 }
 
 export default App
