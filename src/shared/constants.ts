@@ -1,7 +1,7 @@
 // Pure data shared between client and logic — no three.js here.
 
 // The field players and ball are confined to: a circle around the origin.
-export const STADIUM_RADIUS = 20
+export const STADIUM_RADIUS = 28
 
 // Ring goals are part of the field boundary, one per side, facing the field.
 export const GOAL_Z = STADIUM_RADIUS

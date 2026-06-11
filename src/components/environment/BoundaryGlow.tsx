@@ -15,7 +15,7 @@ function createGlowTexture() {
   // this stays on normal blending with a saturated fire orange
   const gradient = ctx.createLinearGradient(0, 0, 0, 64)
   gradient.addColorStop(0, "rgba(255, 80, 0, 0)")
-  gradient.addColorStop(1, "rgba(255, 80, 0, 0.95)")
+  gradient.addColorStop(1, "rgba(255, 80, 0, 0.55)")
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, 1, 64)
   return new CanvasTexture(canvas)
