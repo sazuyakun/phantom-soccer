@@ -5,8 +5,8 @@ import { characterRefs } from "./players/characterRefs"
 
 // Follows the local player at a constant offset, never rotating,
 // so the world appears to move around your character.
-const CAMERA_OFFSET = new Vector3(0, 3, 3.5)
-const LOOK_HEIGHT = 1.2
+const CAMERA_OFFSET = new Vector3(0, 2.5, 3.5)
+const LOOK_HEIGHT = 2.3
 
 const playerPosition = new Vector3()
 
