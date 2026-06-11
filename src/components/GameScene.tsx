@@ -7,7 +7,7 @@ import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
 import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
-import { StadiumWall } from "./environment/StadiumWall"
+import { StadiumDome } from "./environment/StadiumDome"
 import { PlayerCharacter } from "./players/PlayerCharacter"
 
 const SKY_BLUE = "#87ceeb"
@@ -42,7 +42,7 @@ export function GameScene({
       <Suspense fallback={null}>
         <group rotation-y={worldRotation}>
           <MovementArea />
-          <StadiumWall />
+          <StadiumDome />
           <GoalRing side={1} />
           <GoalRing side={-1} />
           <Ball ball={game.ball} />
