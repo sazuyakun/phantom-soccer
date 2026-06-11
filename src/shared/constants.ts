@@ -10,4 +10,4 @@ export const MOVEMENT_AREA = {
 export const LOGIC_FPS = 10
 
 // Player move speed, world units per second.
-export const MOVE_SPEED = 4
+export const MOVE_SPEED = 10
