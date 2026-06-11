@@ -1,4 +1,4 @@
-import { GOAL_Z } from "../../shared/constants"
+import { GOAL_Z, STADIUM_RADIUS } from "../../shared/constants"
 
 const LINE_WIDTH = 0.18
 const LINE_Y = 0.02 // above the grass to avoid z-fighting
@@ -40,6 +40,14 @@ function KeeperBox({ side }: { side: 1 | -1 }) {
 export function PitchMarkings() {
   return (
     <group>
+      {/* field boundary players can't cross */}
+      <mesh position-y={LINE_Y} rotation-x={-Math.PI / 2}>
+        <ringGeometry
+          args={[STADIUM_RADIUS - LINE_WIDTH, STADIUM_RADIUS + LINE_WIDTH, 96]}
+        />
+        <meshBasicMaterial color="white" />
+      </mesh>
+
       {/* center circle around the kickoff spot */}
       <mesh position-y={LINE_Y} rotation-x={-Math.PI / 2}>
         <ringGeometry

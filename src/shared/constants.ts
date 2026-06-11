@@ -1,10 +1,13 @@
 // Pure data shared between client and logic — no three.js here.
 
-// The stadium is a circle around the origin.
+// The field players and ball are confined to: a circle around the origin.
 export const STADIUM_RADIUS = 20
 
-// Ring goals stand fully inside the boundary, one per side, facing the field.
-export const GOAL_Z = STADIUM_RADIUS - 2
+// The decorative dome is a much larger shell around the field.
+export const DOME_RADIUS = 38
+
+// Ring goals are part of the field boundary, one per side, facing the field.
+export const GOAL_Z = STADIUM_RADIUS
 export const GOAL_RADIUS = 2.2
 // slightly raised: the ring's lowest point floats above the ground
 export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
