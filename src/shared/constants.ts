@@ -31,7 +31,10 @@ export const KICK_FACTOR = 1.4
 export const KICK_LIFT = 0.5
 
 // Fraction of vertical speed kept when the ball bounces off the ground.
-export const BALL_BOUNCE = 0.6
+export const BALL_BOUNCE = 0.45
+
+// Ground impacts slower than this don't bounce — the ball settles into a roll.
+export const BALL_REST_SPEED = 2.5
 
 // Fraction of ball velocity kept each logic tick (rolling friction).
 export const BALL_FRICTION = 0.92

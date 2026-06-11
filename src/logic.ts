@@ -4,6 +4,7 @@ import {
   BALL_AIR_DRAG,
   BALL_BOUNCE,
   BALL_FRICTION,
+  BALL_REST_SPEED,
   GRAVITY,
   JUMP_SPEED,
   KICK_FACTOR,
@@ -76,7 +77,9 @@ function updateBall(game: GameState) {
     if (ball.position.y <= 0) {
       ball.position.y = 0
       ball.velocity.y =
-        ball.velocity.y < -1 ? -ball.velocity.y * BALL_BOUNCE : 0
+        ball.velocity.y < -BALL_REST_SPEED
+          ? -ball.velocity.y * BALL_BOUNCE
+          : 0
     }
   }
 
