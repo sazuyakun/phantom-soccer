@@ -1,49 +1,37 @@
 import { useMemo } from "react"
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from "three"
+import {
+  CanvasTexture,
+  NearestFilter,
+  RepeatWrapping,
+  SRGBColorSpace,
+} from "three"
 
 // much larger than the play area so its edge sits past the horizon
 const FLOOR_SIZE = 100
-// world units covered by one repeat of the texture
-const GRASS_TILE = 16
+// world units covered by one light+dark stripe pair
+const STRIPE_PAIR = 8
 
-const GREENS = ["#6abf4b", "#5fb343", "#74c853", "#65b948"]
-
-// flat-shaded triangles in a few shades of green — the low-poly look
-// without any downloaded asset
-function createLowPolyGrassTexture() {
-  const size = 256
-  const cell = 64
+// classic mowed-pitch stripes: two flat greens, crisp edge
+function createStripeTexture() {
   const canvas = document.createElement("canvas")
-  canvas.width = canvas.height = size
+  canvas.width = 2
+  canvas.height = 2
   const ctx = canvas.getContext("2d")!
-
-  const shade = () => GREENS[Math.floor(Math.random() * GREENS.length)]
-  for (let x = 0; x < size; x += cell) {
-    for (let y = 0; y < size; y += cell) {
-      ctx.fillStyle = shade()
-      ctx.beginPath()
-      ctx.moveTo(x, y)
-      ctx.lineTo(x + cell, y)
-      ctx.lineTo(x, y + cell)
-      ctx.fill()
-      ctx.fillStyle = shade()
-      ctx.beginPath()
-      ctx.moveTo(x + cell, y)
-      ctx.lineTo(x + cell, y + cell)
-      ctx.lineTo(x, y + cell)
-      ctx.fill()
-    }
-  }
+  ctx.fillStyle = "#74c655"
+  ctx.fillRect(0, 0, 2, 1)
+  ctx.fillStyle = "#67b94a"
+  ctx.fillRect(0, 1, 2, 1)
 
   const texture = new CanvasTexture(canvas)
   texture.wrapS = texture.wrapT = RepeatWrapping
-  texture.repeat.set(FLOOR_SIZE / GRASS_TILE, FLOOR_SIZE / GRASS_TILE)
+  texture.repeat.set(1, FLOOR_SIZE / STRIPE_PAIR)
+  texture.magFilter = NearestFilter
   texture.colorSpace = SRGBColorSpace
   return texture
 }
 
 export function MovementArea() {
-  const texture = useMemo(createLowPolyGrassTexture, [])
+  const texture = useMemo(createStripeTexture, [])
 
   return (
     <mesh rotation-x={-Math.PI / 2}>

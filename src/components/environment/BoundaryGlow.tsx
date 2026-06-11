@@ -3,7 +3,7 @@ import { CanvasTexture, DoubleSide } from "three"
 
 import { GOAL_COLORS, STADIUM_RADIUS } from "../../shared/constants"
 
-const GLOW_HEIGHT = 1.2
+const GLOW_HEIGHT = 2.5
 
 // vertical gradient in the side's team color, fading out upward.
 // normal blending — additive would sum with the grass into yellow
