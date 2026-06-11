@@ -64,17 +64,6 @@ export function updateCharacters(game: GameState) {
       character.position.z *= limit / fromCenter
     }
 
-    for (const o of game.obstacles) {
-      const ox = character.position.x - o.x
-      const oz = character.position.z - o.z
-      const d = Math.sqrt(ox * ox + oz * oz)
-      const min = o.radius + 0.4
-      if (d < min && d > 0) {
-        character.position.x = o.x + (ox / d) * min
-        character.position.z = o.z + (oz / d) * min
-      }
-    }
-
     character.angle = Math.atan2(dx, dz)
     character.speed =
       Math.sqrt(controls.x * controls.x + controls.y * controls.y) * MOVE_SPEED

@@ -25,12 +25,6 @@ export function isAirborne(character: Character) {
   return character.position.y > 0 || character.velocityY !== 0
 }
 
-export type Obstacle = {
-  x: number
-  z: number
-  radius: number
-}
-
 export type Ball = {
   position: Vec3
   velocity: Vec3
@@ -40,6 +34,5 @@ export interface GameState {
   characters: Character[]
   controls: Record<PlayerId, Controls>
   ball: Ball
-  obstacles: Obstacle[]
   scores: { near: number; far: number }
 }

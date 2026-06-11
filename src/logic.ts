@@ -2,7 +2,6 @@ import type { RuneClient } from "rune-sdk"
 
 import { updateBall } from "./logic/ball"
 import { addCharacter, updateCharacters } from "./logic/characters"
-import { generateObstacles } from "./logic/obstacles"
 import { LOGIC_FPS } from "./shared/constants"
 import { clamp } from "./shared/math"
 import { Controls, GameState } from "./shared/types"
@@ -27,7 +26,6 @@ Rune.initLogic({
       characters: [],
       controls: {},
       ball: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
-      obstacles: generateObstacles(allPlayerIds),
       scores: { near: 0, far: 0 },
     }
 

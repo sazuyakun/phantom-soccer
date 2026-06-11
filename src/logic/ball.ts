@@ -11,7 +11,6 @@ import {
   KICK_LIFT,
   KICK_RANGE,
   LOGIC_FPS,
-  OBSTACLE_HEIGHT,
   STADIUM_RADIUS,
 } from "../shared/constants"
 import { GameState } from "../shared/types"
@@ -75,29 +74,6 @@ function collideFieldEdge(game: GameState): "goal" | undefined {
   }
 }
 
-function collideObstacles(game: GameState) {
-  const { ball } = game
-  if (ball.position.y >= OBSTACLE_HEIGHT) return
-
-  for (const o of game.obstacles) {
-    const dx = ball.position.x - o.x
-    const dz = ball.position.z - o.z
-    const d = Math.sqrt(dx * dx + dz * dz)
-    const min = o.radius + BALL_RADIUS
-    if (d >= min || d === 0) continue
-
-    const nx = dx / d
-    const nz = dz / d
-    ball.position.x = o.x + nx * min
-    ball.position.z = o.z + nz * min
-    const inward = ball.velocity.x * nx + ball.velocity.z * nz
-    if (inward < 0) {
-      ball.velocity.x = (ball.velocity.x - 2 * inward * nx) * 0.7
-      ball.velocity.z = (ball.velocity.z - 2 * inward * nz) * 0.7
-    }
-  }
-}
-
 function applyDrag(game: GameState) {
   const { ball } = game
   const drag = ball.position.y > 0 ? BALL_AIR_DRAG : BALL_FRICTION
@@ -120,6 +96,5 @@ export function updateBall(game: GameState) {
   game.ball.position.z += game.ball.velocity.z / LOGIC_FPS
 
   if (collideFieldEdge(game) === "goal") return
-  collideObstacles(game)
   applyDrag(game)
 }

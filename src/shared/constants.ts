@@ -8,9 +8,6 @@ export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
 
 export const GOALS_TO_WIN = 3
 
-export const OBSTACLE_COUNT = 6
-export const OBSTACLE_HEIGHT = 1.6
-
 export const LOGIC_FPS = 10
 
 export const MOVE_SPEED = 10
