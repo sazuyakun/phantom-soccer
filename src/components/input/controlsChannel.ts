@@ -3,7 +3,7 @@ import { Controls } from "../../shared/types"
 // Single send path for all inputs: the joystick writes the stick state
 // and flushes on an interval; jump flushes immediately for responsiveness.
 const current: Controls = { x: 0, y: 0, jump: false }
-let lastSent = { x: 0, y: 0 }
+let lastSent: Controls = { x: 0, y: 0, jump: false }
 
 export function setStick(x: number, y: number) {
   current.x = x
@@ -20,6 +20,6 @@ export function flush() {
     return
   }
   Rune.actions.move({ ...current })
-  lastSent = { x: current.x, y: current.y }
+  lastSent = { ...current }
   current.jump = false
 }

@@ -7,7 +7,7 @@ import {
   MOVE_SPEED,
   MOVEMENT_AREA,
 } from "./shared/constants"
-import { Character, Controls } from "./shared/types"
+import { Character, Controls, isAirborne } from "./shared/types"
 
 export interface GameState {
   characters: Character[]
@@ -75,7 +75,7 @@ Rune.initLogic({
         character.velocityY = JUMP_SPEED
         controls.jump = false
       }
-      if (character.position.y > 0 || character.velocityY !== 0) {
+      if (isAirborne(character)) {
         character.position.y = Math.max(
           0,
           character.position.y + character.velocityY / LOGIC_FPS

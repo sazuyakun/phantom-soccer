@@ -26,3 +26,8 @@ export type Character = {
   // vertical velocity in units/sec while jumping or falling
   velocityY: number
 }
+
+// single definition of "off the ground", shared by physics and animation
+export function isAirborne(character: Character) {
+  return character.position.y > 0 || character.velocityY !== 0
+}

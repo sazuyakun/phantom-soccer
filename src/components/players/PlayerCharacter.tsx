@@ -7,7 +7,7 @@ import { SkeletonUtils } from "three-stdlib"
 import knightUrl from "../../assets/models/Knight_Male.gltf?url"
 import pirateUrl from "../../assets/models/Pirate_Male.gltf?url"
 import { MOVE_SPEED } from "../../shared/constants"
-import { Character } from "../../shared/types"
+import { Character, isAirborne } from "../../shared/types"
 import { characterRefs } from "./characterRefs"
 
 // one model per player, picked by join order
@@ -89,8 +89,11 @@ export function PlayerCharacter(props: {
     const g = group.current
     if (!g) return
 
-    const airborne = character.position.y > 0 || character.velocityY !== 0
-    const anim = airborne ? "Jump" : character.speed > 0 ? "Run" : "Idle"
+    const anim = isAirborne(character)
+      ? "Jump"
+      : character.speed > 0
+        ? "Run"
+        : "Idle"
     if (anim !== currentAnim.current) {
       actions[currentAnim.current]?.fadeOut(0.2)
       actions[anim]?.reset().fadeIn(0.2).play()
