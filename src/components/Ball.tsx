@@ -2,7 +2,7 @@ import { useFrame, useLoader } from "@react-three/fiber"
 import { useRef } from "react"
 import { Mesh, SRGBColorSpace, TextureLoader, Vector3 } from "three"
 
-import ballTextureUrl from "../assets/ball.jpg"
+import ballTextureUrl from "../assets/ball.png"
 import { BALL_RADIUS } from "../shared/constants"
 import { Ball as BallState } from "../shared/types"
 
@@ -55,12 +55,7 @@ export function Ball({ ball }: { ball: BallState }) {
   return (
     <mesh ref={mesh} position={[0, BALL_RADIUS, 0]}>
       <sphereGeometry args={[BALL_RADIUS, 32, 32]} />
-      <meshStandardMaterial
-        map={texture}
-        color="#d8b860"
-        metalness={0.45}
-        roughness={0.5}
-      />
+      <meshStandardMaterial map={texture} roughness={0.4} />
     </mesh>
   )
 }
