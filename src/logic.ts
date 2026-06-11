@@ -76,10 +76,10 @@ function updateBall(game: GameState) {
     ball.velocity.y -= GRAVITY / LOGIC_FPS
     if (ball.position.y <= 0) {
       ball.position.y = 0
-      ball.velocity.y =
-        ball.velocity.y < -BALL_REST_SPEED
-          ? -ball.velocity.y * BALL_BOUNCE
-          : 0
+      // settle when the rebound would be weak — judging the impact speed
+      // instead lets clamp-to-floor energy sustain bounces forever
+      const rebound = -ball.velocity.y * BALL_BOUNCE
+      ball.velocity.y = rebound > BALL_REST_SPEED ? rebound : 0
     }
   }
 
