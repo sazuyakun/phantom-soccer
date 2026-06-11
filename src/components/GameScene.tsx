@@ -5,10 +5,10 @@ import { Suspense } from "react"
 import { GameState } from "../logic"
 import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
+import { BoundaryGlow } from "./environment/BoundaryGlow"
 import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
 import { PitchMarkings } from "./environment/PitchMarkings"
-import { StadiumDome } from "./environment/StadiumDome"
 import { PlayerCharacter } from "./players/PlayerCharacter"
 
 const SKY_BLUE = "#87ceeb"
@@ -44,7 +44,7 @@ export function GameScene({
         <group rotation-y={worldRotation}>
           <MovementArea />
           <PitchMarkings />
-          <StadiumDome />
+          <BoundaryGlow />
           <GoalRing side={1} />
           <GoalRing side={-1} />
           <Ball ball={game.ball} />

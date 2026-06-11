@@ -3,9 +3,6 @@
 // The field players and ball are confined to: a circle around the origin.
 export const STADIUM_RADIUS = 20
 
-// The decorative dome is a much larger shell around the field.
-export const DOME_RADIUS = 38
-
 // Ring goals are part of the field boundary, one per side, facing the field.
 export const GOAL_Z = STADIUM_RADIUS
 export const GOAL_RADIUS = 2.2
