@@ -8,6 +8,7 @@ import { CameraRig } from "./CameraRig"
 import { BoundaryGlow } from "./environment/BoundaryGlow"
 import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
+import { Obstacles } from "./environment/Obstacles"
 import { PitchMarkings } from "./environment/PitchMarkings"
 import { PlayerCharacter } from "./players/PlayerCharacter"
 
@@ -45,6 +46,7 @@ export function GameScene({
           <MovementArea />
           <PitchMarkings />
           <BoundaryGlow />
+          <Obstacles obstacles={game.obstacles} />
           <GoalRing side={1} />
           <GoalRing side={-1} />
           <Ball ball={game.ball} />

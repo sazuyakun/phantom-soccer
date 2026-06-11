@@ -15,6 +15,11 @@ export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
 // First player to this many goals wins.
 export const GOALS_TO_WIN = 3
 
+// Randomized rock obstacles scattered on the field.
+export const OBSTACLE_COUNT = 6
+// Balls flying above this clear the rocks.
+export const OBSTACLE_HEIGHT = 1.6
+
 // Logic tick rate; the client interpolates in between.
 export const LOGIC_FPS = 10
 

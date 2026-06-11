@@ -1,8 +1,10 @@
 import { useAnimations, useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Group, Mesh, MeshStandardMaterial } from "three"
+import { Group } from "three"
 import { SkeletonUtils } from "three-stdlib"
+
+import { restoreGltfColors } from "../gltfColors"
 
 import knightUrl from "../../assets/models/Knight_Male.gltf?url"
 import pirateUrl from "../../assets/models/Pirate_Male.gltf?url"
@@ -44,17 +46,7 @@ export function PlayerCharacter(props: {
   // the loaded scene is shared and cached; each player gets a skeleton-aware clone
   const model = useMemo(() => {
     const clone = SkeletonUtils.clone(scene)
-    // these exports double-gamma their colors and render near-black;
-    // converting back once restores the intended palette
-    clone.traverse((node) => {
-      if (
-        node instanceof Mesh &&
-        node.material instanceof MeshStandardMaterial
-      ) {
-        node.material = node.material.clone()
-        node.material.color.convertLinearToSRGB()
-      }
-    })
+    restoreGltfColors(clone)
     return clone
   }, [scene])
 
