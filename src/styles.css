@@ -22,6 +22,20 @@ canvas {
   touch-action: none;
 }
 
+#score {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 18px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 #jump {
   position: fixed;
   bottom: 32px;

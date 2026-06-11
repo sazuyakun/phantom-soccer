@@ -4,7 +4,11 @@ import {
   BALL_AIR_DRAG,
   BALL_BOUNCE,
   BALL_FRICTION,
+  BALL_RADIUS,
   BALL_REST_SPEED,
+  GOAL_CENTER_Y,
+  GOAL_RADIUS,
+  GOALS_TO_WIN,
   GRAVITY,
   JUMP_SPEED,
   KICK_FACTOR,
@@ -12,7 +16,7 @@ import {
   KICK_RANGE,
   LOGIC_FPS,
   MOVE_SPEED,
-  MOVEMENT_AREA,
+  STADIUM_RADIUS,
 } from "./shared/constants"
 import { Ball, Character, Controls, isAirborne } from "./shared/types"
 
@@ -20,6 +24,8 @@ export interface GameState {
   characters: Character[]
   controls: Record<PlayerId, Controls>
   ball: Ball
+  // goals scored by the player on each side
+  scores: { near: number; far: number }
 }
 
 type GameActions = {
@@ -49,6 +55,42 @@ function addCharacter(id: PlayerId, state: GameState) {
     speed: 0,
     velocityY: 0,
   })
+}
+
+// after a goal everyone returns to kickoff positions
+function resetPositions(game: GameState) {
+  game.ball.position = { x: 0, y: 0, z: 0 }
+  game.ball.velocity = { x: 0, y: 0, z: 0 }
+  for (const character of game.characters) {
+    character.position = { x: 0, y: 0, z: character.side * SPAWN_DISTANCE }
+    character.angle = character.side === 1 ? Math.PI : 0
+    character.speed = 0
+    character.velocityY = 0
+  }
+}
+
+// the ring on your home side is the one your opponent scores in
+function scoreGoal(game: GameState, ringSide: 1 | -1) {
+  if (ringSide === 1) game.scores.far++
+  else game.scores.near++
+  resetPositions(game)
+
+  const winnerSide =
+    game.scores.near >= GOALS_TO_WIN
+      ? 1
+      : game.scores.far >= GOALS_TO_WIN
+        ? -1
+        : 0
+  if (winnerSide !== 0) {
+    Rune.gameOver({
+      players: Object.fromEntries(
+        game.characters.map((c) => [
+          c.id,
+          c.side === winnerSide ? "WON" : "LOST",
+        ])
+      ),
+    })
+  }
 }
 
 function updateBall(game: GameState) {
@@ -86,16 +128,28 @@ function updateBall(game: GameState) {
   ball.position.x += ball.velocity.x / LOGIC_FPS
   ball.position.z += ball.velocity.z / LOGIC_FPS
 
-  // bounce off the edges of the movement area, losing some pace
-  const limitX = MOVEMENT_AREA.width / 2
-  const limitZ = MOVEMENT_AREA.depth / 2
-  if (Math.abs(ball.position.x) > limitX) {
-    ball.position.x = clamp(ball.position.x, limitX)
-    ball.velocity.x *= -0.7
-  }
-  if (Math.abs(ball.position.z) > limitZ) {
-    ball.position.z = clamp(ball.position.z, limitZ)
-    ball.velocity.z *= -0.7
+  // reaching the wall: a goal if inside a ring, otherwise bounce
+  const limit = STADIUM_RADIUS - BALL_RADIUS
+  const fromCenter = Math.sqrt(ball.position.x ** 2 + ball.position.z ** 2)
+  if (fromCenter > limit) {
+    const centerY = ball.position.y + BALL_RADIUS
+    const offCenter = Math.sqrt(
+      ball.position.x ** 2 + (centerY - GOAL_CENTER_Y) ** 2
+    )
+    if (offCenter < GOAL_RADIUS - 0.3) {
+      scoreGoal(game, ball.position.z > 0 ? 1 : -1)
+      return
+    }
+
+    const nx = ball.position.x / fromCenter
+    const nz = ball.position.z / fromCenter
+    ball.position.x = nx * limit
+    ball.position.z = nz * limit
+    const outward = ball.velocity.x * nx + ball.velocity.z * nz
+    if (outward > 0) {
+      ball.velocity.x = (ball.velocity.x - 2 * outward * nx) * 0.7
+      ball.velocity.z = (ball.velocity.z - 2 * outward * nz) * 0.7
+    }
   }
 
   const drag = ball.position.y > 0 ? BALL_AIR_DRAG : BALL_FRICTION
@@ -120,6 +174,7 @@ Rune.initLogic({
       characters: [],
       controls: {},
       ball: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
+      scores: { near: 0, far: 0 },
     }
 
     for (const id of allPlayerIds) {
@@ -168,14 +223,19 @@ Rune.initLogic({
       const dx = character.side * controls.x * MOVE_PER_TICK
       const dz = -character.side * controls.y * MOVE_PER_TICK
 
-      character.position.x = clamp(
-        character.position.x + dx,
-        MOVEMENT_AREA.width / 2
+      character.position.x += dx
+      character.position.z += dz
+
+      // stay inside the circular stadium
+      const fromCenter = Math.sqrt(
+        character.position.x ** 2 + character.position.z ** 2
       )
-      character.position.z = clamp(
-        character.position.z + dz,
-        MOVEMENT_AREA.depth / 2
-      )
+      const limit = STADIUM_RADIUS - 0.5
+      if (fromCenter > limit) {
+        character.position.x *= limit / fromCenter
+        character.position.z *= limit / fromCenter
+      }
+
       character.angle = Math.atan2(dx, dz)
       character.speed =
         Math.sqrt(controls.x * controls.x + controls.y * controls.y) *

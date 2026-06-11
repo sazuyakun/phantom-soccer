@@ -5,7 +5,9 @@ import { Suspense } from "react"
 import { GameState } from "../logic"
 import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
+import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
+import { StadiumWall } from "./environment/StadiumWall"
 import { PlayerCharacter } from "./players/PlayerCharacter"
 
 const SKY_BLUE = "#87ceeb"
@@ -40,6 +42,9 @@ export function GameScene({
       <Suspense fallback={null}>
         <group rotation-y={worldRotation}>
           <MovementArea />
+          <StadiumWall />
+          <GoalRing side={1} />
+          <GoalRing side={-1} />
           <Ball ball={game.ball} />
 
           {game.characters.map((character, index) => (

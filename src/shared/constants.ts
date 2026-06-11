@@ -1,10 +1,16 @@
 // Pure data shared between client and logic — no three.js here.
 
-// Playable area in world units: x along the landscape axis, z toward camera.
-export const MOVEMENT_AREA = {
-  width: 48,
-  depth: 32,
-} as const
+// The stadium is a circle around the origin.
+export const STADIUM_RADIUS = 20
+
+// Ring goals stand on the stadium boundary, one per side, facing the field.
+export const GOAL_Z = STADIUM_RADIUS
+export const GOAL_RADIUS = 2.2
+// slightly raised: the ring's lowest point floats above the ground
+export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
+
+// First player to this many goals wins.
+export const GOALS_TO_WIN = 3
 
 // Logic tick rate; the client interpolates in between.
 export const LOGIC_FPS = 10
