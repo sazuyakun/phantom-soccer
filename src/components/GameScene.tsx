@@ -3,6 +3,7 @@ import { PlayerId } from "rune-sdk"
 import { Suspense } from "react"
 
 import { GameState } from "../logic"
+import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
 import { MovementArea } from "./environment/MovementArea"
 import { PlayerCharacter } from "./players/PlayerCharacter"
@@ -39,6 +40,7 @@ export function GameScene({
       <Suspense fallback={null}>
         <group rotation-y={worldRotation}>
           <MovementArea />
+          <Ball ball={game.ball} />
 
           {game.characters.map((character, index) => (
             <PlayerCharacter

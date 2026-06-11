@@ -31,3 +31,9 @@ export type Character = {
 export function isAirborne(character: Character) {
   return character.position.y > 0 || character.velocityY !== 0
 }
+
+export type Ball = {
+  position: Vec3
+  // ground velocity in units/sec; the ball never leaves the floor
+  velocity: { x: number; z: number }
+}

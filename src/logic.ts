@@ -1,17 +1,21 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
 import {
+  BALL_FRICTION,
   GRAVITY,
   JUMP_SPEED,
+  KICK_FACTOR,
+  KICK_RANGE,
   LOGIC_FPS,
   MOVE_SPEED,
   MOVEMENT_AREA,
 } from "./shared/constants"
-import { Character, Controls, isAirborne } from "./shared/types"
+import { Ball, Character, Controls, isAirborne } from "./shared/types"
 
 export interface GameState {
   characters: Character[]
   controls: Record<PlayerId, Controls>
+  ball: Ball
 }
 
 type GameActions = {
@@ -43,13 +47,57 @@ function addCharacter(id: PlayerId, state: GameState) {
   })
 }
 
+function updateBall(game: GameState) {
+  const { ball } = game
+
+  // a moving, grounded player in kick range sends the ball away from them
+  for (const character of game.characters) {
+    if (character.speed === 0 || character.position.y > 0) continue
+
+    const dx = ball.position.x - character.position.x
+    const dz = ball.position.z - character.position.z
+    const distance = Math.sqrt(dx * dx + dz * dz)
+    if (distance > KICK_RANGE || distance === 0) continue
+
+    const kickSpeed = character.speed * KICK_FACTOR
+    ball.velocity.x = (dx / distance) * kickSpeed
+    ball.velocity.z = (dz / distance) * kickSpeed
+  }
+
+  ball.position.x += ball.velocity.x / LOGIC_FPS
+  ball.position.z += ball.velocity.z / LOGIC_FPS
+
+  // bounce off the edges of the movement area, losing some pace
+  const limitX = MOVEMENT_AREA.width / 2
+  const limitZ = MOVEMENT_AREA.depth / 2
+  if (Math.abs(ball.position.x) > limitX) {
+    ball.position.x = clamp(ball.position.x, limitX)
+    ball.velocity.x *= -0.7
+  }
+  if (Math.abs(ball.position.z) > limitZ) {
+    ball.position.z = clamp(ball.position.z, limitZ)
+    ball.velocity.z *= -0.7
+  }
+
+  ball.velocity.x *= BALL_FRICTION
+  ball.velocity.z *= BALL_FRICTION
+  if (Math.abs(ball.velocity.x) + Math.abs(ball.velocity.z) < 0.1) {
+    ball.velocity.x = 0
+    ball.velocity.z = 0
+  }
+}
+
 Rune.initLogic({
   minPlayers: 2,
   maxPlayers: 2,
   landscape: true,
   updatesPerSecond: LOGIC_FPS,
   setup: (allPlayerIds) => {
-    const state: GameState = { characters: [], controls: {} }
+    const state: GameState = {
+      characters: [],
+      controls: {},
+      ball: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, z: 0 } },
+    }
 
     for (const id of allPlayerIds) {
       addCharacter(id, state)
@@ -66,6 +114,8 @@ Rune.initLogic({
     },
   },
   update: ({ game }) => {
+    updateBall(game)
+
     for (const character of game.characters) {
       const controls = game.controls[character.id]
 

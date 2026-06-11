@@ -17,3 +17,12 @@ export const JUMP_SPEED = 5
 
 // Downward acceleration, units/sec².
 export const GRAVITY = 15
+
+// Players within this distance of the ball kick it.
+export const KICK_RANGE = 0.9
+
+// Kicked balls leave at the kicker's speed times this factor.
+export const KICK_FACTOR = 1.4
+
+// Fraction of ball velocity kept each logic tick (rolling friction).
+export const BALL_FRICTION = 0.92
