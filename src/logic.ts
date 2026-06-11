@@ -8,6 +8,7 @@ import {
   BALL_REST_SPEED,
   GOAL_CENTER_Y,
   GOAL_RADIUS,
+  GOAL_Z,
   GOALS_TO_WIN,
   GRAVITY,
   JUMP_SPEED,
@@ -125,22 +126,30 @@ function updateBall(game: GameState) {
     }
   }
 
+  const prevZ = ball.position.z
   ball.position.x += ball.velocity.x / LOGIC_FPS
   ball.position.z += ball.velocity.z / LOGIC_FPS
 
-  // reaching the wall: a goal if inside a ring, otherwise bounce
-  const limit = STADIUM_RADIUS - BALL_RADIUS
-  const fromCenter = Math.sqrt(ball.position.x ** 2 + ball.position.z ** 2)
-  if (fromCenter > limit) {
+  // a goal is the ball crossing a ring's plane, outbound, inside the ring
+  for (const ringSide of [1, -1] as const) {
+    const ringZ = ringSide * GOAL_Z
+    const crossed = (prevZ - ringZ) * (ball.position.z - ringZ) < 0
+    if (!crossed || Math.sign(ball.velocity.z) !== ringSide) continue
+
     const centerY = ball.position.y + BALL_RADIUS
     const offCenter = Math.sqrt(
       ball.position.x ** 2 + (centerY - GOAL_CENTER_Y) ** 2
     )
     if (offCenter < GOAL_RADIUS - 0.3) {
-      scoreGoal(game, ball.position.z > 0 ? 1 : -1)
+      scoreGoal(game, ringSide)
       return
     }
+  }
 
+  // bounce off the circular stadium wall, losing some pace
+  const limit = STADIUM_RADIUS - BALL_RADIUS
+  const fromCenter = Math.sqrt(ball.position.x ** 2 + ball.position.z ** 2)
+  if (fromCenter > limit) {
     const nx = ball.position.x / fromCenter
     const nz = ball.position.z / fromCenter
     ball.position.x = nx * limit

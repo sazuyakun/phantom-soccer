@@ -7,6 +7,7 @@ import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
 import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
+import { PitchMarkings } from "./environment/PitchMarkings"
 import { StadiumDome } from "./environment/StadiumDome"
 import { PlayerCharacter } from "./players/PlayerCharacter"
 
@@ -42,6 +43,7 @@ export function GameScene({
       <Suspense fallback={null}>
         <group rotation-y={worldRotation}>
           <MovementArea />
+          <PitchMarkings />
           <StadiumDome />
           <GoalRing side={1} />
           <GoalRing side={-1} />

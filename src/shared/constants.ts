@@ -3,8 +3,8 @@
 // The stadium is a circle around the origin.
 export const STADIUM_RADIUS = 20
 
-// Ring goals stand on the stadium boundary, one per side, facing the field.
-export const GOAL_Z = STADIUM_RADIUS
+// Ring goals stand fully inside the boundary, one per side, facing the field.
+export const GOAL_Z = STADIUM_RADIUS - 2
 export const GOAL_RADIUS = 2.2
 // slightly raised: the ring's lowest point floats above the ground
 export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
