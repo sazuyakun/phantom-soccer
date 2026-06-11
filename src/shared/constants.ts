@@ -5,6 +5,9 @@ export const STADIUM_RADIUS = 28
 
 // Ring goals are part of the field boundary, one per side, facing the field.
 export const GOAL_Z = STADIUM_RADIUS
+
+// Team color of each side's goal ring and boundary half.
+export const GOAL_COLORS = { 1: "#3b82f6", [-1]: "#f97316" } as const
 export const GOAL_RADIUS = 2.2
 // slightly raised: the ring's lowest point floats above the ground
 export const GOAL_CENTER_Y = GOAL_RADIUS + 0.5
