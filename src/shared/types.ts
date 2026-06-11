@@ -33,7 +33,9 @@ export function isAirborne(character: Character) {
 }
 
 export type Ball = {
+  // position.y is elevation above resting height (0 = on the ground);
+  // the client adds the ball radius when rendering
   position: Vec3
-  // ground velocity in units/sec; the ball never leaves the floor
-  velocity: { x: number; z: number }
+  // velocity in units/sec; kicks launch the ball with upward velocity
+  velocity: Vec3
 }

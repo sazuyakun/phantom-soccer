@@ -1,45 +1,33 @@
-import { useFrame } from "@react-three/fiber"
-import { useMemo, useRef } from "react"
-import { CanvasTexture, Mesh, SRGBColorSpace, Vector3 } from "three"
+import { useFrame, useLoader } from "@react-three/fiber"
+import { useRef } from "react"
+import { Mesh, SRGBColorSpace, TextureLoader, Vector3 } from "three"
 
+import ballTextureUrl from "../assets/ball.jpg"
+import { BALL_RADIUS } from "../shared/constants"
 import { Ball as BallState } from "../shared/types"
 
-const RADIUS = 0.3
 // corrections larger than this snap instead of gliding
-const SNAP_DISTANCE = 2
+const SNAP_DISTANCE = 3
 // glide speed once the ball has stopped but the render lags behind
 const SETTLE_SPEED = 4
 
 const rollAxis = new Vector3()
 
-// classic white ball with black patches, drawn once on a canvas —
-// lighter than any downloaded model
-function createBallTexture() {
-  const canvas = document.createElement("canvas")
-  canvas.width = canvas.height = 128
-  const ctx = canvas.getContext("2d")!
-  ctx.fillStyle = "#ffffff"
-  ctx.fillRect(0, 0, 128, 128)
-  ctx.fillStyle = "#222222"
-  for (let row = 0; row < 2; row++) {
-    for (let col = 0; col < 2; col++) {
-      ctx.beginPath()
-      ctx.arc(32 + col * 64 + (row % 2) * 32, 32 + row * 64, 13, 0, Math.PI * 2)
-      ctx.fill()
-    }
-  }
-  const texture = new CanvasTexture(canvas)
-  texture.colorSpace = SRGBColorSpace
-  return texture
-}
-
 export function Ball({ ball }: { ball: BallState }) {
   const mesh = useRef<Mesh>(null)
-  const texture = useMemo(createBallTexture, [])
+  const texture = useLoader(TextureLoader, ballTextureUrl)
+  texture.colorSpace = SRGBColorSpace
 
   useFrame((_, delta) => {
     const m = mesh.current
     if (!m) return
+
+    // vertical at its own rate (flight is faster than the settle glide)
+    const targetY = ball.position.y + BALL_RADIUS
+    const stepY = Math.max(4, Math.abs(ball.velocity.y)) * delta
+    if (m.position.y < targetY)
+      m.position.y = Math.min(targetY, m.position.y + stepY)
+    else m.position.y = Math.max(targetY, m.position.y - stepY)
 
     const dx = ball.position.x - m.position.x
     const dz = ball.position.z - m.position.z
@@ -61,13 +49,18 @@ export function Ball({ ball }: { ball: BallState }) {
 
     // roll around the axis perpendicular to the motion
     rollAxis.set(moveZ, 0, -moveX).normalize()
-    m.rotateOnWorldAxis(rollAxis, step / RADIUS)
+    m.rotateOnWorldAxis(rollAxis, step / BALL_RADIUS)
   })
 
   return (
-    <mesh ref={mesh} position={[0, RADIUS, 0]}>
-      <sphereGeometry args={[RADIUS, 24, 24]} />
-      <meshStandardMaterial map={texture} />
+    <mesh ref={mesh} position={[0, BALL_RADIUS, 0]}>
+      <sphereGeometry args={[BALL_RADIUS, 32, 32]} />
+      <meshStandardMaterial
+        map={texture}
+        color="#d8b860"
+        metalness={0.45}
+        roughness={0.5}
+      />
     </mesh>
   )
 }

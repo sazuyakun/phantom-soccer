@@ -1,10 +1,13 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
 import {
+  BALL_AIR_DRAG,
+  BALL_BOUNCE,
   BALL_FRICTION,
   GRAVITY,
   JUMP_SPEED,
   KICK_FACTOR,
+  KICK_LIFT,
   KICK_RANGE,
   LOGIC_FPS,
   MOVE_SPEED,
@@ -26,7 +29,7 @@ declare global {
   const Rune: RuneClient<GameState, GameActions>
 }
 
-const SPAWN_DISTANCE = 3
+const SPAWN_DISTANCE = 6
 const MOVE_PER_TICK = MOVE_SPEED / LOGIC_FPS
 
 function clamp(value: number, limit: number) {
@@ -50,9 +53,10 @@ function addCharacter(id: PlayerId, state: GameState) {
 function updateBall(game: GameState) {
   const { ball } = game
 
-  // a moving, grounded player in kick range sends the ball away from them
+  // a moving, grounded player in kick range sends the ball flying away
   for (const character of game.characters) {
     if (character.speed === 0 || character.position.y > 0) continue
+    if (ball.position.y > 1.2) continue // too high to reach
 
     const dx = ball.position.x - character.position.x
     const dz = ball.position.z - character.position.z
@@ -62,6 +66,18 @@ function updateBall(game: GameState) {
     const kickSpeed = character.speed * KICK_FACTOR
     ball.velocity.x = (dx / distance) * kickSpeed
     ball.velocity.z = (dz / distance) * kickSpeed
+    ball.velocity.y = kickSpeed * KICK_LIFT
+  }
+
+  // vertical flight with gravity and ground bounces
+  if (ball.position.y > 0 || ball.velocity.y !== 0) {
+    ball.position.y += ball.velocity.y / LOGIC_FPS
+    ball.velocity.y -= GRAVITY / LOGIC_FPS
+    if (ball.position.y <= 0) {
+      ball.position.y = 0
+      ball.velocity.y =
+        ball.velocity.y < -1 ? -ball.velocity.y * BALL_BOUNCE : 0
+    }
   }
 
   ball.position.x += ball.velocity.x / LOGIC_FPS
@@ -79,9 +95,13 @@ function updateBall(game: GameState) {
     ball.velocity.z *= -0.7
   }
 
-  ball.velocity.x *= BALL_FRICTION
-  ball.velocity.z *= BALL_FRICTION
-  if (Math.abs(ball.velocity.x) + Math.abs(ball.velocity.z) < 0.1) {
+  const drag = ball.position.y > 0 ? BALL_AIR_DRAG : BALL_FRICTION
+  ball.velocity.x *= drag
+  ball.velocity.z *= drag
+  if (
+    ball.position.y === 0 &&
+    Math.abs(ball.velocity.x) + Math.abs(ball.velocity.z) < 0.1
+  ) {
     ball.velocity.x = 0
     ball.velocity.z = 0
   }
@@ -96,7 +116,7 @@ Rune.initLogic({
     const state: GameState = {
       characters: [],
       controls: {},
-      ball: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, z: 0 } },
+      ball: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
     }
 
     for (const id of allPlayerIds) {
