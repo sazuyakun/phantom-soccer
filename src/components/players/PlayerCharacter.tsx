@@ -12,13 +12,10 @@ import { MOVE_SPEED } from "../../shared/constants"
 import { Character, isAirborne } from "../../shared/types"
 import { characterRefs } from "./characterRefs"
 
-// one model per player, picked by join order
 const MODEL_URLS = [knightUrl, pirateUrl]
 MODEL_URLS.forEach((url) => useGLTF.preload(url))
 
-// how fast a character turns to face its travel direction, radians/sec
 const TURN_SPEED = 10
-// corrections larger than this (e.g. a rollback) snap instead of gliding
 const SNAP_DISTANCE = 2
 
 function moveToward(current: number, target: number, step: number) {
@@ -26,7 +23,6 @@ function moveToward(current: number, target: number, step: number) {
   return Math.max(target, current - step)
 }
 
-// move-toward for angles, wrapping around ±π
 function interpolateAngle(current: number, target: number, step: number) {
   if (Math.abs(target - current) > Math.PI) {
     current += Math.sign(target - current) * 2 * Math.PI
@@ -43,15 +39,12 @@ export function PlayerCharacter(props: {
   const { scene, animations } = useGLTF(
     MODEL_URLS[modelIndex % MODEL_URLS.length]
   )
-  // the loaded scene is shared and cached; each player gets a skeleton-aware clone
   const model = useMemo(() => {
     const clone = SkeletonUtils.clone(scene)
     restoreGltfColors(clone)
     return clone
   }, [scene])
 
-  // the transform is driven from useFrame; the spawn pose is frozen so
-  // React prop re-application can't fight the interpolation
   const group = useRef<Group>(null)
   const [spawn] = useState(() => ({
     position: [
@@ -103,9 +96,6 @@ export function PlayerCharacter(props: {
       return
     }
 
-    // walk toward the logic position along the travel direction at the
-    // reported speed (per-axis stepping stutters on diagonals);
-    // MOVE_SPEED fallback glides the last stretch after stopping
     const step = (character.speed || MOVE_SPEED) * delta
     if (step >= distance) {
       g.position.x = target.x
@@ -120,7 +110,6 @@ export function PlayerCharacter(props: {
       TURN_SPEED * delta
     )
 
-    // vertical at its own rate; the floor keeps it from lagging near the apex
     const stepY = Math.max(3, Math.abs(character.velocityY)) * delta
     g.position.y = moveToward(g.position.y, target.y, stepY)
   })

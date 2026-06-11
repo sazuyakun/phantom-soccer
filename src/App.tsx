@@ -20,11 +20,9 @@ function App() {
   }, [])
 
   if (!game) {
-    // Rune only shows your game after an onChange() so no need for loading screen
     return
   }
 
-  // your score reads first on your own phone
   const you = game.characters.find((c) => c.id === yourPlayerId)
   const scores =
     you?.side === -1
@@ -37,7 +35,6 @@ function App() {
       <div id="score">
         {scores[0]} — {scores[1]}
       </div>
-      {/* spectators don't get controls */}
       {yourPlayerId && (
         <>
           <Joystick />

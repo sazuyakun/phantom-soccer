@@ -17,13 +17,12 @@ import {
 import { GameState } from "../shared/types"
 import { scoreGoal } from "./match"
 
-// a moving, grounded player in kick range sends the ball flying away
 function applyKicks(game: GameState) {
   const { ball } = game
 
   for (const character of game.characters) {
     if (character.speed === 0 || character.position.y > 0) continue
-    if (ball.position.y > 1.2) continue // too high to reach
+    if (ball.position.y > 1.2) continue
 
     const dx = ball.position.x - character.position.x
     const dz = ball.position.z - character.position.z
@@ -37,7 +36,6 @@ function applyKicks(game: GameState) {
   }
 }
 
-// vertical flight with gravity and ground bounces
 function applyGravity(game: GameState) {
   const { ball } = game
   if (ball.position.y === 0 && ball.velocity.y === 0) return
@@ -46,14 +44,11 @@ function applyGravity(game: GameState) {
   ball.velocity.y -= GRAVITY / LOGIC_FPS
   if (ball.position.y <= 0) {
     ball.position.y = 0
-    // settle when the rebound would be weak — judging the impact speed
-    // instead lets clamp-to-floor energy sustain bounces forever
     const rebound = -ball.velocity.y * BALL_BOUNCE
     ball.velocity.y = rebound > BALL_REST_SPEED ? rebound : 0
   }
 }
 
-// reaching the field edge: a goal if inside a ring, otherwise bounce
 function collideFieldEdge(game: GameState): "goal" | undefined {
   const { ball } = game
   const limit = STADIUM_RADIUS - BALL_RADIUS
@@ -80,7 +75,6 @@ function collideFieldEdge(game: GameState): "goal" | undefined {
   }
 }
 
-// low balls bounce off rocks; high ones fly over
 function collideObstacles(game: GameState) {
   const { ball } = game
   if (ball.position.y >= OBSTACLE_HEIGHT) return

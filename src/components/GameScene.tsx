@@ -5,7 +5,6 @@ import { Suspense } from "react"
 import { GameState } from "../logic"
 import { Ball } from "./Ball"
 import { CameraRig } from "./CameraRig"
-import { BoundaryGlow } from "./environment/BoundaryGlow"
 import { GoalRing } from "./environment/GoalRing"
 import { MovementArea } from "./environment/MovementArea"
 import { Obstacles } from "./environment/Obstacles"
@@ -14,7 +13,6 @@ import { PlayerCharacter } from "./players/PlayerCharacter"
 
 const SKY_BLUE = "#87ceeb"
 
-// Initial pose only — CameraRig takes over from the first frame.
 const CAMERA_POSITION: [number, number, number] = [0, 2, 5.5]
 const CAMERA_LOOK_AT: [number, number, number] = [0, 0.6, 0]
 
@@ -25,8 +23,6 @@ export function GameScene({
   game: GameState
   yourPlayerId: PlayerId | undefined
 }) {
-  // the world rotates 180° for the far-side player, so each phone
-  // shows its own character nearest the camera
   const you = game.characters.find((c) => c.id === yourPlayerId)
   const worldRotation = you?.side === -1 ? Math.PI : 0
 
@@ -45,7 +41,6 @@ export function GameScene({
         <group rotation-y={worldRotation}>
           <MovementArea />
           <PitchMarkings />
-          <BoundaryGlow />
           <Obstacles obstacles={game.obstacles} />
           <GoalRing side={1} />
           <GoalRing side={-1} />

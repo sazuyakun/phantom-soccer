@@ -12,7 +12,6 @@ import { GameState, isAirborne } from "../shared/types"
 export const SPAWN_DISTANCE = 6
 const MOVE_PER_TICK = MOVE_SPEED / LOGIC_FPS
 
-// players spawn facing each other; each client shows its own side near the camera
 export function addCharacter(id: PlayerId, state: GameState) {
   const side = state.characters.some((c) => c.side === 1) ? -1 : 1
 
@@ -26,13 +25,10 @@ export function addCharacter(id: PlayerId, state: GameState) {
   })
 }
 
-// apply one logic tick of jumping, gravity and joystick movement
 export function updateCharacters(game: GameState) {
   for (const character of game.characters) {
     const controls = game.controls[character.id]
 
-    // jump only from the ground; the flag is consumed so holding it
-    // doesn't bunny-hop on landing
     if (controls?.jump && character.position.y === 0) {
       character.velocityY = JUMP_SPEED
       controls.jump = false
@@ -53,14 +49,12 @@ export function updateCharacters(game: GameState) {
       continue
     }
 
-    // controls are in the player's view space; their side maps it to world space
     const dx = character.side * controls.x * MOVE_PER_TICK
     const dz = -character.side * controls.y * MOVE_PER_TICK
 
     character.position.x += dx
     character.position.z += dz
 
-    // stay inside the circular stadium
     const fromCenter = Math.sqrt(
       character.position.x ** 2 + character.position.z ** 2
     )
@@ -70,7 +64,6 @@ export function updateCharacters(game: GameState) {
       character.position.z *= limit / fromCenter
     }
 
-    // rocks block walking
     for (const o of game.obstacles) {
       const ox = character.position.x - o.x
       const oz = character.position.z - o.z

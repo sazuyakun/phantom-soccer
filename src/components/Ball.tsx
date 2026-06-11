@@ -6,9 +6,7 @@ import ballTextureUrl from "../assets/ball.png"
 import { BALL_RADIUS } from "../shared/constants"
 import { Ball as BallState } from "../shared/types"
 
-// corrections larger than this snap instead of gliding
 const SNAP_DISTANCE = 3
-// glide speed once the ball has stopped but the render lags behind
 const SETTLE_SPEED = 4
 
 const rollAxis = new Vector3()
@@ -22,7 +20,6 @@ export function Ball({ ball }: { ball: BallState }) {
     const m = mesh.current
     if (!m) return
 
-    // vertical at its own rate (flight is faster than the settle glide)
     const targetY = ball.position.y + BALL_RADIUS
     const stepY = Math.max(4, Math.abs(ball.velocity.y)) * delta
     if (m.position.y < targetY)
@@ -47,7 +44,6 @@ export function Ball({ ball }: { ball: BallState }) {
     m.position.x += moveX
     m.position.z += moveZ
 
-    // roll around the axis perpendicular to the motion
     rollAxis.set(moveZ, 0, -moveX).normalize()
     m.rotateOnWorldAxis(rollAxis, step / BALL_RADIUS)
   })

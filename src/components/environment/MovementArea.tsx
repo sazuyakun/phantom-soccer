@@ -6,12 +6,9 @@ import {
   SRGBColorSpace,
 } from "three"
 
-// much larger than the play area so its edge sits past the horizon
 const FLOOR_SIZE = 100
-// world units covered by one light+dark stripe pair
 const STRIPE_PAIR = 8
 
-// classic mowed-pitch stripes: two flat greens, crisp edge
 function createStripeTexture() {
   const canvas = document.createElement("canvas")
   canvas.width = 2

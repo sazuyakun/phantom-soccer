@@ -4,9 +4,7 @@ import { useEffect, useRef } from "react"
 import { LOGIC_FPS } from "../../shared/constants"
 import { flush, setStick } from "./controlsChannel"
 
-// stick movement below this magnitude doesn't count as moving
 const DEAD_ZONE = 0.25
-// report controls at most once per logic tick, and only on change
 const SEND_INTERVAL = 1000 / LOGIC_FPS
 
 export function Joystick() {
@@ -26,7 +24,6 @@ export function Joystick() {
         setStick(0, 0)
         return
       }
-      // quantize so tiny tremors don't register as changed controls
       setStick(Math.round(vector.x * 30) / 30, Math.round(vector.y * 30) / 30)
     })
     manager.on("end", () => {

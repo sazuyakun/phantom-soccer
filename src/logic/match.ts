@@ -2,7 +2,6 @@ import { GOALS_TO_WIN } from "../shared/constants"
 import { GameState } from "../shared/types"
 import { SPAWN_DISTANCE } from "./characters"
 
-// after a goal everyone returns to kickoff positions
 export function resetPositions(game: GameState) {
   game.ball.position = { x: 0, y: 0, z: 0 }
   game.ball.velocity = { x: 0, y: 0, z: 0 }
@@ -14,7 +13,6 @@ export function resetPositions(game: GameState) {
   }
 }
 
-// the ring on your home side is the one your opponent scores in
 export function scoreGoal(game: GameState, ringSide: 1 | -1) {
   if (ringSide === 1) game.scores.far++
   else game.scores.near++

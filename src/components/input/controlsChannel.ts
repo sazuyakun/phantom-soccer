@@ -1,7 +1,5 @@
 import { Controls } from "../../shared/types"
 
-// Single send path for all inputs: the joystick writes the stick state
-// and flushes on an interval; jump flushes immediately for responsiveness.
 const current: Controls = { x: 0, y: 0, jump: false }
 let lastSent: Controls = { x: 0, y: 0, jump: false }
 

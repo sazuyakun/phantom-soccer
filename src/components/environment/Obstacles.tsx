@@ -19,10 +19,8 @@ function Rock({ obstacle, index }: { obstacle: Obstacle; index: number }) {
     return clone
   }, [scene])
 
-  // variety without state: rotation derived from the synced position
   const rotation = (obstacle.x * 7 + obstacle.z * 13) % (Math.PI * 2)
 
-  // footprint matches the collider; height stays at what flying balls clear
   return (
     <primitive
       object={model}

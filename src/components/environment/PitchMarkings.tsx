@@ -1,11 +1,10 @@
 import { GOAL_Z, STADIUM_RADIUS } from "../../shared/constants"
 
 const LINE_WIDTH = 0.18
-const LINE_Y = 0.02 // above the grass to avoid z-fighting
+const LINE_Y = 0.02
 const CENTER_CIRCLE_RADIUS = 4
 const BOX = { width: 9, depth: 4.5 }
 
-// a flat white line on the ground, centered at (x, z)
 function Line(props: {
   x?: number
   z?: number
@@ -21,7 +20,6 @@ function Line(props: {
   )
 }
 
-// goalkeeping box in front of one goal
 function KeeperBox({ side }: { side: 1 | -1 }) {
   const backZ = side * GOAL_Z
   const frontZ = side * (GOAL_Z - BOX.depth)
@@ -40,7 +38,6 @@ function KeeperBox({ side }: { side: 1 | -1 }) {
 export function PitchMarkings() {
   return (
     <group>
-      {/* field boundary players can't cross */}
       <mesh position-y={LINE_Y} rotation-x={-Math.PI / 2}>
         <ringGeometry
           args={[STADIUM_RADIUS - LINE_WIDTH, STADIUM_RADIUS + LINE_WIDTH, 96]}
@@ -48,7 +45,6 @@ export function PitchMarkings() {
         <meshBasicMaterial color="white" />
       </mesh>
 
-      {/* center circle around the kickoff spot */}
       <mesh position-y={LINE_Y} rotation-x={-Math.PI / 2}>
         <ringGeometry
           args={[
