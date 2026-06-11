@@ -1,6 +1,12 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
-import { LOGIC_FPS, MOVE_SPEED, MOVEMENT_AREA } from "./shared/constants"
+import {
+  GRAVITY,
+  JUMP_SPEED,
+  LOGIC_FPS,
+  MOVE_SPEED,
+  MOVEMENT_AREA,
+} from "./shared/constants"
 import { Character, Controls } from "./shared/types"
 
 export interface GameState {
@@ -33,6 +39,7 @@ function addCharacter(id: PlayerId, state: GameState) {
     angle: side === 1 ? Math.PI : 0,
     side,
     speed: 0,
+    velocityY: 0,
   })
 }
 
@@ -62,6 +69,23 @@ Rune.initLogic({
     for (const character of game.characters) {
       const controls = game.controls[character.id]
 
+      // jump only from the ground; the flag is consumed so holding it
+      // doesn't bunny-hop on landing
+      if (controls?.jump && character.position.y === 0) {
+        character.velocityY = JUMP_SPEED
+        controls.jump = false
+      }
+      if (character.position.y > 0 || character.velocityY !== 0) {
+        character.position.y = Math.max(
+          0,
+          character.position.y + character.velocityY / LOGIC_FPS
+        )
+        character.velocityY =
+          character.position.y === 0
+            ? 0
+            : character.velocityY - GRAVITY / LOGIC_FPS
+      }
+
       if (!controls || (controls.x === 0 && controls.y === 0)) {
         character.speed = 0
         continue
@@ -90,6 +114,7 @@ Rune.initLogic({
       game.controls[playerId] = {
         x: clamp(controls.x, 1),
         y: clamp(controls.y, 1),
+        jump: controls.jump || game.controls[playerId]?.jump || false,
       }
     },
   },

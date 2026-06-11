@@ -3,6 +3,7 @@ import { PlayerId } from "rune-sdk"
 
 import { GameScene } from "./components/GameScene"
 import { Joystick } from "./components/input/Joystick"
+import { JumpButton } from "./components/input/JumpButton"
 import { GameState } from "./logic.ts"
 
 function App() {
@@ -27,7 +28,12 @@ function App() {
     <>
       <GameScene game={game} yourPlayerId={yourPlayerId} />
       {/* spectators don't get controls */}
-      {yourPlayerId && <Joystick />}
+      {yourPlayerId && (
+        <>
+          <Joystick />
+          <JumpButton />
+        </>
+      )}
     </>
   )
 }

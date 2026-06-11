@@ -11,3 +11,9 @@ export const LOGIC_FPS = 10
 
 // Player move speed, world units per second.
 export const MOVE_SPEED = 10
+
+// Initial upward velocity of a jump, units/sec.
+export const JUMP_SPEED = 5
+
+// Downward acceleration, units/sec².
+export const GRAVITY = 15

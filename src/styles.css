@@ -21,3 +21,17 @@ canvas {
   height: 130px;
   touch-action: none;
 }
+
+#jump {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 96px;
+  height: 96px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 32px;
+  touch-action: none;
+}

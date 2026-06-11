@@ -19,13 +19,17 @@ const TURN_SPEED = 10
 // corrections larger than this (e.g. a rollback) snap instead of gliding
 const SNAP_DISTANCE = 2
 
+function moveToward(current: number, target: number, step: number) {
+  if (current < target) return Math.min(target, current + step)
+  return Math.max(target, current - step)
+}
+
 // move-toward for angles, wrapping around ±π
 function interpolateAngle(current: number, target: number, step: number) {
   if (Math.abs(target - current) > Math.PI) {
     current += Math.sign(target - current) * 2 * Math.PI
   }
-  if (current < target) return Math.min(target, current + step)
-  return Math.max(target, current - step)
+  return moveToward(current, target, step)
 }
 
 export function PlayerCharacter(props: {
@@ -43,7 +47,10 @@ export function PlayerCharacter(props: {
     // these exports double-gamma their colors and render near-black;
     // converting back once restores the intended palette
     clone.traverse((node) => {
-      if (node instanceof Mesh && node.material instanceof MeshStandardMaterial) {
+      if (
+        node instanceof Mesh &&
+        node.material instanceof MeshStandardMaterial
+      ) {
         node.material = node.material.clone()
         node.material.color.convertLinearToSRGB()
       }
@@ -82,7 +89,8 @@ export function PlayerCharacter(props: {
     const g = group.current
     if (!g) return
 
-    const anim = character.speed > 0 ? "Run" : "Idle"
+    const airborne = character.position.y > 0 || character.velocityY !== 0
+    const anim = airborne ? "Jump" : character.speed > 0 ? "Run" : "Idle"
     if (anim !== currentAnim.current) {
       actions[currentAnim.current]?.fadeOut(0.2)
       actions[anim]?.reset().fadeIn(0.2).play()
@@ -116,6 +124,10 @@ export function PlayerCharacter(props: {
       character.angle,
       TURN_SPEED * delta
     )
+
+    // vertical at its own rate; the floor keeps it from lagging near the apex
+    const stepY = Math.max(3, Math.abs(character.velocityY)) * delta
+    g.position.y = moveToward(g.position.y, target.y, stepY)
   })
 
   return (
