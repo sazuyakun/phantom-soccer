@@ -1,14 +1,20 @@
+import { useAnimations, useGLTF } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
-import { useEffect, useRef, useState } from "react"
-import { Group } from "three"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { Group, Mesh, MeshStandardMaterial } from "three"
+import { SkeletonUtils } from "three-stdlib"
 
+import knightUrl from "../../assets/models/Knight_Male.gltf?url"
+import pirateUrl from "../../assets/models/Pirate_Male.gltf?url"
 import { MOVE_SPEED } from "../../shared/constants"
 import { Character } from "../../shared/types"
 import { characterRefs } from "./characterRefs"
 
-const BLOB_COLORS = ["#e2574c", "#4c8be2"]
+// one model per player, picked by join order
+const MODEL_URLS = [knightUrl, pirateUrl]
+MODEL_URLS.forEach((url) => useGLTF.preload(url))
 
-// how fast a blob turns to face its travel direction, radians/sec
+// how fast a character turns to face its travel direction, radians/sec
 const TURN_SPEED = 10
 // corrections larger than this (e.g. a rollback) snap instead of gliding
 const SNAP_DISTANCE = 2
@@ -22,16 +28,28 @@ function interpolateAngle(current: number, target: number, step: number) {
   return Math.max(target, current - step)
 }
 
-/**
- * Placeholder player built from primitives — swaps for a glTF model
- * later without changing its interface.
- */
-export function PlayerBlob(props: {
+export function PlayerCharacter(props: {
   character: Character
-  colorIndex: number
+  modelIndex: number
 }) {
-  const { character, colorIndex } = props
-  const color = BLOB_COLORS[colorIndex % BLOB_COLORS.length]
+  const { character, modelIndex } = props
+
+  const { scene, animations } = useGLTF(
+    MODEL_URLS[modelIndex % MODEL_URLS.length]
+  )
+  // the loaded scene is shared and cached; each player gets a skeleton-aware clone
+  const model = useMemo(() => {
+    const clone = SkeletonUtils.clone(scene)
+    // these exports double-gamma their colors and render near-black;
+    // converting back once restores the intended palette
+    clone.traverse((node) => {
+      if (node instanceof Mesh && node.material instanceof MeshStandardMaterial) {
+        node.material = node.material.clone()
+        node.material.color.convertLinearToSRGB()
+      }
+    })
+    return clone
+  }, [scene])
 
   // the transform is driven from useFrame; the spawn pose is frozen so
   // React prop re-application can't fight the interpolation
@@ -45,6 +63,13 @@ export function PlayerBlob(props: {
     angle: character.angle,
   }))
 
+  const { actions } = useAnimations(animations, group)
+  const currentAnim = useRef("Idle")
+
+  useEffect(() => {
+    actions.Idle?.play()
+  }, [actions])
+
   useEffect(() => {
     const g = group.current
     if (g) characterRefs.set(character.id, g)
@@ -56,6 +81,13 @@ export function PlayerBlob(props: {
   useFrame((_, delta) => {
     const g = group.current
     if (!g) return
+
+    const anim = character.speed > 0 ? "Run" : "Idle"
+    if (anim !== currentAnim.current) {
+      actions[currentAnim.current]?.fadeOut(0.2)
+      actions[anim]?.reset().fadeIn(0.2).play()
+      currentAnim.current = anim
+    }
 
     const target = character.position
     const dx = target.x - g.position.x
@@ -88,33 +120,7 @@ export function PlayerBlob(props: {
 
   return (
     <group ref={group} position={spawn.position} rotation-y={spawn.angle}>
-      {/* body */}
-      <mesh position-y={0.55}>
-        <sphereGeometry args={[0.55, 24, 24]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-
-      {/* eyes */}
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * 0.18, 0.72, 0.46]}>
-          <sphereGeometry args={[0.07, 12, 12]} />
-          <meshBasicMaterial color="#222222" />
-        </mesh>
-      ))}
-
-      {/* mouth */}
-      <mesh position={[0, 0.48, 0.51]}>
-        <boxGeometry args={[0.22, 0.05, 0.05]} />
-        <meshBasicMaterial color="#222222" />
-      </mesh>
-
-      {/* hands */}
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * 0.6, 0.45, 0]}>
-          <sphereGeometry args={[0.14, 12, 12]} />
-          <meshBasicMaterial color={color} />
-        </mesh>
-      ))}
+      <primitive object={model} />
     </group>
   )
 }

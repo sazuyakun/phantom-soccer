@@ -5,7 +5,7 @@ import { Suspense } from "react"
 import { GameState } from "../logic"
 import { CameraRig } from "./CameraRig"
 import { MovementArea } from "./environment/MovementArea"
-import { PlayerBlob } from "./players/PlayerBlob"
+import { PlayerCharacter } from "./players/PlayerCharacter"
 
 const SKY_BLUE = "#87ceeb"
 
@@ -13,12 +13,13 @@ const SKY_BLUE = "#87ceeb"
 const CAMERA_POSITION: [number, number, number] = [0, 2, 5.5]
 const CAMERA_LOOK_AT: [number, number, number] = [0, 0.6, 0]
 
-export function GameScene(props: {
+export function GameScene({
+  game,
+  yourPlayerId,
+}: {
   game: GameState
   yourPlayerId: PlayerId | undefined
 }) {
-  const { game, yourPlayerId } = props
-
   // the world rotates 180° for the far-side player, so each phone
   // shows its own character nearest the camera
   const you = game.characters.find((c) => c.id === yourPlayerId)
@@ -31,21 +32,23 @@ export function GameScene(props: {
       onCreated={({ camera }) => camera.lookAt(...CAMERA_LOOK_AT)}
     >
       <color attach="background" args={[SKY_BLUE]} />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} />
       <CameraRig targetId={yourPlayerId} />
 
-      <group rotation-y={worldRotation}>
-        <Suspense fallback={null}>
+      <Suspense fallback={null}>
+        <group rotation-y={worldRotation}>
           <MovementArea />
-        </Suspense>
 
-        {game.characters.map((character, index) => (
-          <PlayerBlob
-            key={character.id}
-            character={character}
-            colorIndex={index}
-          />
-        ))}
-      </group>
+          {game.characters.map((character, index) => (
+            <PlayerCharacter
+              key={character.id}
+              character={character}
+              modelIndex={index}
+            />
+          ))}
+        </group>
+      </Suspense>
     </Canvas>
   )
 }
